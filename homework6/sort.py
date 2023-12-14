@@ -79,11 +79,7 @@ def move(root_path, file_path):
     new_path = new_folder/new_name
 
     new_folder.mkdir(exist_ok=True)
-
-    if file_path.exists():
-        file_path.rename(new_path)
-    else:
-        new_folder.rmdir()
+    file_path.rename(new_path)
 
 
 def sort_folder(root_path, folder_path):
