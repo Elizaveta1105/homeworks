@@ -31,15 +31,22 @@ def normalize(name: str):
     return name
 
 
-def process_archives(root_path):
-    category = "archives"
-    extract_dir = root_path/category
-    for file in extract_dir.iterdir():
+def is_archive(file_path):
+    suffix = file_path.suffix.lower()
+    return suffix in {".zip", ".gz", ".tar"}
+
+
+def process_files(root_path, file_path):
+    category = define_category(file_path.suffix.lower())
+    if is_archive(file_path):
         try:
-            shutil.unpack_archive(file, extract_dir)
-            file.unlink()
+            extract_dir = root_path/category
+            shutil.unpack_archive(file_path, extract_dir)
+            file_path.unlink()
         except Exception:
-            file.unlink()
+            file_path.unlink()
+    else:
+        move(root_path, file_path)
 
 
 def create_categories():
@@ -89,13 +96,12 @@ def sort_folder(root_path, folder_path):
             if not any(el.iterdir()):
                 el.rmdir()
         elif el.is_file():
-            move(root_path, el)
+            process_files(root_path, el)
 
 
 def main():
     path = Path(argv[1])
     sort_folder(path, path)
-    process_archives(path)
 
 
 if __name__ == '__main__':
